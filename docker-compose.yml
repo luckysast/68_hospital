@@ -1,0 +1,38 @@
+version: '2'
+
+networks:
+  app_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.24.24.0/24
+        gateway: 172.24.24.1
+services:
+  db:
+    container_name: 'hospital_db'
+    image: mysql:5.7
+    environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=hospital
+    - MYSQL_USER=lucky
+    - MYSQL_PASSWORD=SrHd89cRfFXlBAa7
+    restart: always
+    hostname: hospital_db
+    command: --init-file /data/application/init.sql
+    volumes:
+        - ./init.sql:/data/application/init.sql
+    networks:
+      app_net:
+        ipv4_address: 172.24.24.10
+  app:
+    container_name: 'hospital_app'
+    build: .
+    restart: always
+    ports:
+      - 1488:1488
+    networks:
+      app_net:
+        ipv4_address: 172.24.24.20
